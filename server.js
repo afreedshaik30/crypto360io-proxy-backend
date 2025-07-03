@@ -7,9 +7,9 @@ app.use(cors()); // Allow all origins
 
 const PORT = 5000;
 
-// 📌 1. Get Coin List
 app.get("/coins/markets", async (req, res) => {
-  const { currency } = req.query;
+  let { currency = "usd" } = req.query;
+
   try {
     const response = await axios.get(
       `https://api.coingecko.com/api/v3/coins/markets`,
@@ -25,7 +25,8 @@ app.get("/coins/markets", async (req, res) => {
     );
     res.json(response.data);
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    console.error("Error fetching /coins/markets:", err.message);
+    res.status(500).json({ error: "Failed to fetch coin markets" });
   }
 });
 
@@ -64,20 +65,9 @@ app.get("/coins/:id/market_chart", async (req, res) => {
 
 // 📌 4. Get Trending Coins
 app.get("/trending", async (req, res) => {
-  const { currency } = req.query;
   try {
     const response = await axios.get(
-      `https://api.coingecko.com/api/v3/coins/markets`,
-      {
-        params: {
-          vs_currency: currency,
-          order: "gecko_desc",
-          per_page: 10,
-          page: 1,
-          sparkline: false,
-          price_change_percentage: "24h",
-        },
-      }
+      "https://api.coingecko.com/api/v3/search/trending"
     );
     res.json(response.data);
   } catch (err) {
